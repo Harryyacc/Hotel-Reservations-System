@@ -1,0 +1,90 @@
+#include <iostream>
+#include <fstream>
+#include <sstream>
+#include <string>
+using namespace std;
+
+struct roomBooking {
+    string roomNo;
+    string clientName;
+    string roomKey;
+    string noOfNights;
+    string totalDues;
+};
+
+void availableRooms();
+
+int main(){
+    ifstream isExisting("Reservations.csv");
+    if(!isExisting){
+        ofstream createFile("Reservations.csv");
+        createFile << "RoomNo,ClientName,RoomKey,NoOfNights,TotalDues\n";
+        createFile.close();
+    }
+    isExisting.close();
+
+        roomBooking add;
+        availableRooms();
+        cout << "Enter room number from above list: ";
+        cin >> add.roomNo;
+
+        cout << "Enter client name(Only first name): ";
+        cin >> add.clientName;
+
+        cout << "Enter room safety key: ";
+        cin >> add.roomKey;
+
+        cout << "Enter number of nights: ";
+        cin >> add.noOfNights;
+
+        int totalDuess=stoi(add.noOfNights)*5000;
+
+        add.totalDues = to_string(totalDuess);
+
+        cout << "\nTotal dues to pay: " << add.totalDues << endl;
+
+        ofstream fileBooking("Reservations.csv", ios::app);
+
+        fileBooking << add.roomNo << ","<< add.clientName << ","<< add.roomKey << ","<< add.noOfNights << ","<< add.totalDues << "\n";
+
+        fileBooking.close();
+        cout<<"\nBooked successfully...\n";
+        
+    return 0;
+}
+
+//Function for rooms 
+void availableRooms() {
+    string arr[60];
+    int rooms = 60;
+
+    for(int i=0; i<rooms; i++){
+        arr[i] = to_string(i+1);
+    }
+
+    ifstream roomChecking("Reservations.csv");
+    string line, ID;
+    getline(roomChecking, line); // skip header
+
+    while(getline(roomChecking, line)){
+        stringstream roomNum(line);
+        getline(roomNum, ID, ',');
+
+        for(int i=0; i<rooms; i++){
+            if(arr[i] == ID){
+                for(int j=i; j<rooms-1; j++){
+                    arr[j] = arr[j+1];
+                }
+                rooms--;
+                break;
+            }
+        }
+    }
+    roomChecking.close();
+
+    cout << "\nAvailable Rooms:\n";
+    for(int i=0; i<rooms; i++){
+        cout << arr[i] << " ";
+    }
+    cout << endl;
+}
